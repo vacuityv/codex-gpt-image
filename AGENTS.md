@@ -17,6 +17,25 @@ codex plugin marketplace add vacuityv/codex-gpt-image
 codex plugin add codex-api-gpt-image@vacuityv-plugins
 ```
 
+## 如果沙箱拦住了网络
+
+安装必须联网（要从 GitHub 拉取）。如果你看到 `EPERM`、连接被拒或类似的沙箱网络错误：
+
+**正确做法**：向用户申请提权（带网络访问）后重试上面的命令。交互式会话里用户点一下"允许"即可。
+
+**不要**做这些：
+
+- 不要改用手动拷贝文件的方式绕过（见下方禁止事项）。
+- 不要建议 `npx skills add ...` 之类的第三方命令 —— 那些工具跟本项目的 `codex plugin`
+  机制无关，照着跑装不出可用的插件。
+- 如果确实拿不到网络权限，就如实告诉用户"沙箱不允许联网，安装失败"，并让他在**普通终端**里跑：
+
+  ```bash
+  bash <(curl -fsSL https://raw.githubusercontent.com/vacuityv/codex-gpt-image/main/install.sh)
+  ```
+
+  终端不受 Codex 沙箱限制。不要自己编别的命令。
+
 ## 禁止事项
 
 - **不要**把 `plugins/codex-api-gpt-image/skills/gpt-image/` 拷到 `~/.codex/skills/`。
