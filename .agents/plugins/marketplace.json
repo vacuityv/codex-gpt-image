@@ -1,11 +1,18 @@
 {
-  "name": "gpt-image-local",
-  "interface": { "displayName": "GPT Image (local)" },
+  "name": "gpt-image",
+  "interface": {
+    "displayName": "GPT Image"
+  },
   "plugins": [
     {
       "name": "gpt-image",
-      "source": { "source": "local", "path": "./plugins/gpt-image" },
-      "policy": { "installation": "AVAILABLE" },
+      "source": {
+        "source": "local",
+        "path": "./plugins/gpt-image"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
       "category": "Productivity"
     }
   ]

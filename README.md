@@ -12,19 +12,21 @@ Codex 内置的 `image_gen` 是 Responses API 的 **hosted tool**（服务端执
 
 ## 安装
 
+复制这三行执行即可（第三行是自检，不发请求、不花钱）：
+
 ```bash
-codex plugin marketplace add <本仓库地址>
+codex plugin marketplace add vacuityv/codex-gpt-image
 ```
 
 ```bash
-codex plugin add gpt-image@gpt-image-local
+codex plugin add gpt-image@gpt-image
 ```
-
-装完自检凭据（不发请求、不花钱）：
 
 ```bash
-python3 ~/.codex/plugins/cache/gpt-image-local/gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py --check
+python3 ~/.codex/plugins/cache/gpt-image/gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py --check
 ```
+
+自检输出会告诉你 base 和 key 各自从哪来。如果 key 显示"未找到"，看下面的[凭据配置](#凭据配置)。
 
 之后在 codex 里正常说"画一张 xxx"即可，codex 会自己触发这个技能。
 
@@ -59,7 +61,7 @@ export GPT_IMAGE_BASE_URL=https://your-relay/v1   # 用官方则不必设
 ## 直接用 CLI
 
 ```bash
-S=~/.codex/plugins/cache/gpt-image-local/gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py
+S=~/.codex/plugins/cache/gpt-image/gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py
 
 # 文生图
 python3 "$S" -p "水墨风格，一匹马在沙漠奔跑" --size 1536x1024 --quality high -o horse.png
@@ -94,7 +96,7 @@ python3 "$S" -p "把背景换成雪山" --image in.png -o edited.png
 改完插件源码后重装：
 
 ```bash
-codex plugin remove gpt-image && codex plugin add gpt-image@gpt-image-local
+codex plugin remove gpt-image@gpt-image && codex plugin add gpt-image@gpt-image
 ```
 
 不要把技能目录直接放到 `~/.codex/skills/` —— 那是 codex 托管目录，手动放进去的会被清掉。用户技能必须走 plugin 机制。
