@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+# 出图产物 / 各人自己的凭据文件，都不该进仓库
+*.png
+*.jpg
+*.webp
+gpt-image.json
