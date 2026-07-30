@@ -1,14 +1,14 @@
 {
-  "name": "gpt-image",
+  "name": "vacuityv-plugins",
   "interface": {
-    "displayName": "GPT Image"
+    "displayName": "vacuityv plugins"
   },
   "plugins": [
     {
-      "name": "gpt-image",
+      "name": "codex-api-gpt-image",
       "source": {
         "source": "local",
-        "path": "./plugins/gpt-image"
+        "path": "./plugins/codex-api-gpt-image"
       },
       "policy": {
         "installation": "AVAILABLE"

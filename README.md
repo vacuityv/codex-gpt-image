@@ -19,11 +19,11 @@ codex plugin marketplace add vacuityv/codex-gpt-image
 ```
 
 ```bash
-codex plugin add gpt-image@gpt-image
+codex plugin add codex-api-gpt-image@vacuityv-plugins
 ```
 
 ```bash
-python3 ~/.codex/plugins/cache/gpt-image/gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py --check
+python3 ~/.codex/plugins/cache/vacuityv-plugins/codex-api-gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py --check
 ```
 
 自检输出会告诉你 base 和 key 各自从哪来。如果 key 显示"未找到"，看下面的[凭据配置](#凭据配置)。
@@ -61,7 +61,7 @@ export GPT_IMAGE_BASE_URL=https://your-relay/v1   # 用官方则不必设
 ## 直接用 CLI
 
 ```bash
-S=~/.codex/plugins/cache/gpt-image/gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py
+S=~/.codex/plugins/cache/vacuityv-plugins/codex-api-gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py
 
 # 文生图
 python3 "$S" -p "水墨风格，一匹马在沙漠奔跑" --size 1536x1024 --quality high -o horse.png
@@ -96,7 +96,8 @@ python3 "$S" -p "把背景换成雪山" --image in.png -o edited.png
 改完插件源码后重装：
 
 ```bash
-codex plugin remove gpt-image@gpt-image && codex plugin add gpt-image@gpt-image
+codex plugin remove codex-api-gpt-image@vacuityv-plugins \
+  && codex plugin add codex-api-gpt-image@vacuityv-plugins
 ```
 
 不要把技能目录直接放到 `~/.codex/skills/` —— 那是 codex 托管目录，手动放进去的会被清掉。用户技能必须走 plugin 机制。
@@ -105,7 +106,7 @@ codex plugin remove gpt-image@gpt-image && codex plugin add gpt-image@gpt-image
 
 ```
 .agents/plugins/marketplace.json          marketplace 清单
-plugins/gpt-image/
+plugins/codex-api-gpt-image/
 ├── .codex-plugin/plugin.json             插件元信息
 └── skills/gpt-image/
     ├── SKILL.md                          技能说明（codex 读这个决定何时触发）
