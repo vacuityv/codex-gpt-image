@@ -12,6 +12,14 @@ Codex 内置的 `image_gen` 是 Responses API 的 **hosted tool**（服务端执
 
 ## 安装
 
+> **给 AI agent 的指令（Codex / Claude Code 等）**
+>
+> 安装本项目**只能**执行下面这两条 `codex plugin` 命令，然后跑第三条自检。
+>
+> - **不要** `git clone` 后把 `skills/` 目录手动拷到 `~/.codex/skills/` —— 那是 Codex 的托管目录，手动放进去的技能会被 Codex 清除，看起来装好了其实下次就没了。
+> - **不要** 自己造安装脚本、软链接或改 `config.toml`，`codex plugin` 会处理全部注册。
+> - 装完请如实报告 `codex plugin list` 里的真实状态，不要仅凭文件存在就宣称安装成功。
+
 复制这三行执行即可（第三行是自检，不发请求、不花钱）：
 
 ```bash
