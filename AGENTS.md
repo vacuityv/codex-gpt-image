@@ -17,11 +17,17 @@ codex plugin marketplace add vacuityv/codex-gpt-image
 codex plugin add codex-api-gpt-image@vacuityv-plugins
 ```
 
-## 如果沙箱拦住了网络
+## 如果沙箱拦住了安装
 
-安装必须联网（要从 GitHub 拉取）。如果你看到 `EPERM`、连接被拒或类似的沙箱网络错误：
+安装需要两样默认沙箱都不给的权限：
 
-**正确做法**：向用户申请提权（带网络访问）后重试上面的命令。交互式会话里用户点一下"允许"即可。
+1. **网络** —— 要从 GitHub 拉取（被拦时报 `EPERM` 或连接被拒）
+2. **写 `~/.codex`** —— 注册 marketplace 和插件都写在这里，它在 workspace 之外
+
+所以在默认的 `workspace-write` 沙箱下安装一定会失败。
+
+**正确做法**：向用户申请提权（网络 + 写 `~/.codex`，或直接在沙箱外执行）后重试上面的命令。
+交互式会话里用户点一下"允许"即可。**先申请，不要一遇到权限错误就放弃或改道。**
 
 **不要**做这些：
 
