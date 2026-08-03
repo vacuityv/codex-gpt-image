@@ -1,6 +1,6 @@
 {
   "name": "codex-api-gpt-image",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "用 OpenAI Images API (gpt-image-2) 出图 / 改图，纯标准库 CLI，适配自定义 provider 与中转",
   "interface": {
     "displayName": "GPT Image",

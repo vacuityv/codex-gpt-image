@@ -30,13 +30,13 @@ if [ -z "$STATUS" ]; then
 fi
 echo "  $STATUS"
 
-SCRIPT="$HOME/.codex/plugins/cache/$MARKET/$PLUGIN/0.1.0/skills/gpt-image/scripts/gen_image.py"
+SCRIPT=$(ls -d "$HOME/.codex/plugins/cache/$MARKET/$PLUGIN"/*/skills/gpt-image/scripts/gen_image.py 2>/dev/null | tail -1)
 echo
 echo "→ 凭据自检（不发请求、不产生费用）"
-if [ -f "$SCRIPT" ]; then
+if [ -n "$SCRIPT" ] && [ -f "$SCRIPT" ]; then
   python3 "$SCRIPT" --check 2>&1 | sed 's/^/  /'
 else
-  echo "  ! 未找到脚本 $SCRIPT，版本号可能已变，请用 codex plugin list 的路径自行确认。" >&2
+  echo "  ! 未找到 gen_image.py，请用 codex plugin list 里的路径自行确认。" >&2
 fi
 
 echo

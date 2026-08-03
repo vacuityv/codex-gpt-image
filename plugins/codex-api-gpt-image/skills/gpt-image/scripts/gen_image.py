@@ -40,6 +40,7 @@ USER_AGENT = "curl/8.4.0"
 CODEX_HOME = os.environ.get("CODEX_HOME") or os.path.expanduser("~/.codex")
 SKILL_CONF = os.path.join(CODEX_HOME, "gpt-image.json")
 CODEX_CONF = os.path.join(CODEX_HOME, "config.toml")
+AUTH_CONF = os.path.join(CODEX_HOME, "auth.json")
 
 
 def _load_skill_conf():
@@ -49,6 +50,20 @@ def _load_skill_conf():
         return d if isinstance(d, dict) else {}
     except Exception:
         return {}
+
+
+def _load_codex_auth():
+    """codex login --with-api-key 会把 key 写进 ~/.codex/auth.json。
+
+    ChatGPT 登录写的是 tokens（OAuth），那种 token 不能用于 Images API，忽略。
+    """
+    try:
+        with open(AUTH_CONF) as f:
+            d = json.load(f)
+    except Exception:
+        return {}
+    k = d.get("OPENAI_API_KEY")
+    return {"api_key": k} if k and str(k).strip() else {}
 
 
 def _load_codex_provider():
@@ -98,6 +113,7 @@ def resolve():
     """返回 (base, key, base_src, key_src)。"""
     conf = _load_skill_conf()
     prov = _load_codex_provider()
+    auth = _load_codex_auth()
 
     key = key_src = None
     for var in ("GPT_IMAGE_API_KEY", "OPENAI_API_KEY"):
@@ -109,6 +125,8 @@ def resolve():
         key, key_src = conf["api_key"].strip(), "~/.codex/gpt-image.json"
     if not key and prov.get("api_key"):
         key, key_src = prov["api_key"].strip(), "~/.codex/config.toml"
+    if not key and auth.get("api_key"):
+        key, key_src = auth["api_key"].strip(), "~/.codex/auth.json"
 
     base = base_src = None
     for var in ("GPT_IMAGE_BASE_URL", "OPENAI_BASE_URL"):
@@ -124,6 +142,14 @@ def resolve():
         base, base_src = "https://api.openai.com/v1", "默认"
 
     return base.rstrip("/"), key, base_src, key_src
+
+
+def base_candidates(base):
+    """有的中转 base_url 带 /v1（如 https://x.com/v1），有的是裸域名，两种都试。"""
+    base = base.rstrip("/")
+    if base.endswith("/v1"):
+        return [base, base[: -len("/v1")].rstrip("/")]
+    return [base + "/v1", base]
 
 
 def save_images(data, out, n):
@@ -206,12 +232,18 @@ def main():
 
     if args.check:
         print(f"base = {base}   (来源: {base_src})")
+        print(f"       实际会依次尝试: {', '.join(b + '/images/generations' for b in base_candidates(base))}")
         print(f"key  = {'已找到 ' + key[:8] + '…' if key else '未找到'}   (来源: {key_src or '无'})")
         if not key:
-            print("\n配置方法二选一：")
-            print("  1. export GPT_IMAGE_API_KEY=sk-...")
-            print(f"  2. 写 {SKILL_CONF}：")
-            print('     {"base_url": "https://your-relay/v1", "api_key": "sk-..."}')
+            print("\n找过的位置（都没有 key）：")
+            print("  - 环境变量 GPT_IMAGE_API_KEY / OPENAI_API_KEY")
+            print(f"  - {SKILL_CONF}")
+            print(f"  - {CODEX_CONF} 当前 provider 的 bearer")
+            print(f"  - {AUTH_CONF} 的 OPENAI_API_KEY")
+            print("\n最省事的解法：写一个 " + SKILL_CONF + "，内容：")
+            print('  {"base_url": "https://你的中转/v1", "api_key": "sk-..."}')
+            print("\n注意：如果你是 ChatGPT 账号登录（auth.json 里是 tokens 而非")
+            print("OPENAI_API_KEY），那种 OAuth token 不能用于 Images API，必须另配 key。")
         return
 
     if not args.prompt:
@@ -221,23 +253,40 @@ def main():
 
     sys.stderr.write(f"[gpt-image] base={base} ({base_src})  key来源={key_src}  model={args.model}\n")
 
-    try:
+    def send(b):
         if args.image:
             fields = {"model": args.model, "prompt": args.prompt, "n": str(args.n),
                       "size": args.size, "quality": args.quality}
             files = [("image[]", p) for p in args.image]
             if args.mask:
                 files.append(("mask", args.mask))
-            resp = post_multipart(f"{base}/images/edits", fields, files, key)
-        else:
-            payload = {"model": args.model, "prompt": args.prompt, "n": args.n,
-                       "size": args.size, "quality": args.quality}
-            resp = post_json(f"{base}/images/generations", payload, key)
-        body = json.loads(resp.read().decode())
-    except urllib.error.HTTPError as e:
-        sys.exit(f"请求失败 HTTP {e.code}: {e.read().decode(errors='replace')[:800]}")
-    except urllib.error.URLError as e:
-        sys.exit(f"网络错误: {e}")
+            return post_multipart(f"{b}/images/edits", fields, files, key)
+        payload = {"model": args.model, "prompt": args.prompt, "n": args.n,
+                   "size": args.size, "quality": args.quality}
+        return post_json(f"{b}/images/generations", payload, key)
+
+    body = None
+    last = None
+    candidates = base_candidates(base)
+    for i, b in enumerate(candidates):
+        try:
+            body = json.loads(send(b).read().decode())
+            if b != base:
+                sys.stderr.write(f"[gpt-image] 注意：{base} 不通，改用 {b} 成功。"
+                                 f"建议把 base 固定成 {b}\n")
+            break
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode(errors="replace")
+            last = f"HTTP {e.code}: {detail[:600]}"
+            # 只有"路径不存在"才值得换 base 重试；401/429 等换了也没用
+            if e.code in (404, 405) and i + 1 < len(candidates):
+                sys.stderr.write(f"[gpt-image] {b} 返回 {e.code}，换个前缀再试\n")
+                continue
+            sys.exit(f"请求失败（{b}） {last}")
+        except urllib.error.URLError as e:
+            sys.exit(f"网络错误（{b}）: {e}")
+    if body is None:
+        sys.exit(f"请求失败，所有 base 都不通：{candidates}  最后错误：{last}")
 
     if body.get("error"):
         sys.exit(f"API 错误: {json.dumps(body['error'], ensure_ascii=False)[:800]}")

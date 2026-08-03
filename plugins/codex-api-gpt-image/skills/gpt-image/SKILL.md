@@ -63,9 +63,15 @@ python3 "<skill_dir>/scripts/gen_image.py" \
 2. `~/.codex/gpt-image.json`
 3. `~/.codex/config.toml` 里当前 `model_provider` 那一段的 bearer 和 `base_url`
    （兼容 `experimental_bearer_token`、`http_headers.Authorization`、`env_key` 三种写法）
-4. 兜底官方 `https://api.openai.com/v1`
+4. `~/.codex/auth.json` 里的 `OPENAI_API_KEY`
+5. 兜底官方 `https://api.openai.com/v1`
 
 base 同理：`GPT_IMAGE_BASE_URL` → `OPENAI_BASE_URL` → json → config.toml → 官方。
+base 带不带 `/v1` 都行，脚本会依次尝试两种前缀。
+
+如果自检显示 key 未找到，先跑 `--check` 看它找过哪些位置，再让用户写
+`~/.codex/gpt-image.json`。注意 ChatGPT 账号登录存的是 OAuth `tokens`，
+那个不能用于 Images API，必须另配 key —— 这种情况重装插件没有任何用。
 
 注意 codex 默认不会把 `*KEY*` 这类环境变量传给它执行的命令，所以**第 3 条（复用 config.toml）通常才是实际生效的那条** —— 这也让本技能对"已经在 codex 里配好中转"的人零配置可用。
 

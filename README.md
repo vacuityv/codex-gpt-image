@@ -34,7 +34,7 @@ codex plugin add codex-api-gpt-image@vacuityv-plugins
 ```
 
 ```bash
-python3 ~/.codex/plugins/cache/vacuityv-plugins/codex-api-gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py --check
+python3 ~/.codex/plugins/cache/vacuityv-plugins/codex-api-gpt-image/*/skills/gpt-image/scripts/gen_image.py --check
 ```
 
 自检输出会告诉你 base 和 key 各自从哪来。如果 key 显示"未找到"，看下面的[凭据配置](#凭据配置)。
@@ -48,11 +48,16 @@ python3 ~/.codex/plugins/cache/vacuityv-plugins/codex-api-gpt-image/0.1.0/skills
 1. 环境变量 `GPT_IMAGE_API_KEY` → `OPENAI_API_KEY`
 2. `~/.codex/gpt-image.json`
 3. `~/.codex/config.toml` 里当前 `model_provider` 那一段的 bearer 和 `base_url`
-4. 兜底官方 `https://api.openai.com/v1`
+4. `~/.codex/auth.json` 里的 `OPENAI_API_KEY`（`codex login --with-api-key` 写在这儿）
+5. 兜底官方 `https://api.openai.com/v1`
 
 base 同理：`GPT_IMAGE_BASE_URL` → `OPENAI_BASE_URL` → json → config.toml → 官方。
+base 带不带 `/v1` 都行，脚本两种前缀都会试。
 
-**如果你已经在 codex 里配好了中转 provider，第 3 条会自动生效，装完不用做任何配置。**
+**如果你已经在 codex 里配好了中转 provider，第 3 或第 4 条会自动生效，装完不用做任何配置。**
+
+⚠️ 如果你是 **ChatGPT 账号登录**（`auth.json` 里存的是 `tokens` 而不是 `OPENAI_API_KEY`），
+那种 OAuth token **不能**用于 Images API，自检会显示"key 未找到"，必须按下面的方式另配一个 key。
 
 否则二选一：
 
@@ -72,7 +77,7 @@ export GPT_IMAGE_BASE_URL=https://your-relay/v1   # 用官方则不必设
 ## 直接用 CLI
 
 ```bash
-S=~/.codex/plugins/cache/vacuityv-plugins/codex-api-gpt-image/0.1.0/skills/gpt-image/scripts/gen_image.py
+S=~/.codex/plugins/cache/vacuityv-plugins/codex-api-gpt-image/*/skills/gpt-image/scripts/gen_image.py
 
 # 文生图
 python3 "$S" -p "水墨风格，一匹马在沙漠奔跑" --size 1536x1024 --quality high -o horse.png
