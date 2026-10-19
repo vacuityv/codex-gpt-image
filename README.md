@@ -1,6 +1,6 @@
 # codex-gpt-image
 
-给 Codex CLI 补上生图能力的插件。文生图 / 图生图，走 OpenAI Images API（默认 `gpt-image-2`）。
+给 Codex CLI 补上生图能力的插件。文生图 / 图生图，走 OpenAI Images API（默认 `gpt-image-2.5-flare`）。
 
 ## 为什么需要它
 
@@ -90,9 +90,9 @@ python3 "$S" -p "把背景换成雪山" --image in.png -o edited.png
 |------|------|------|
 | `-p/--prompt` | 提示词（除 `--check` 外必填） | — |
 | `-o/--out` | 输出路径；`n>1` 时自动加 `_1/_2` 后缀 | `image.png` |
-| `--model` | 模型 | `gpt-image-2` |
+| `--model` | 模型 | `gpt-image-2.5-flare` |
 | `--size` | `1024x1024` / `1536x1024` / `1024x1536` / `auto` | `1024x1024` |
-| `--quality` | `low` / `medium` / `high` / `auto` | `auto` |
+| `--quality` | `low` / `medium` / `high` / `xhigh` / `max` / `auto` | `auto` |
 | `-n` | 生成张数 | `1` |
 | `--image` | 参考图，可多次传，触发编辑模式 | — |
 | `--mask` | 蒙版，仅编辑模式 | — |
@@ -105,7 +105,7 @@ python3 "$S" -p "把背景换成雪山" --image in.png -o edited.png
 - **纯标准库**，不依赖 `openai` SDK，不需要 venv，Python 3.8+ 可跑。
 - 同时兼容 `b64_json` 和 `url` 两种响应（不少中转返回的是 URL）。
 - 请求带 `curl` UA —— 中转常挂在 Cloudflare 后面，默认的 Python-urllib UA 会被拦（403 / error 1010）。
-- `gpt-image-2` 不支持 `background=transparent`，要真透明底得换 `--model gpt-image-1.5`。
+- `gpt-image-2` 不支持 `background=transparent`，`gpt-image-2.5-flare` 官方文档也没写支持，要真透明底得换 `--model gpt-image-1.5`。
 
 ## 开发
 

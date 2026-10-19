@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""用 OpenAI Images API（默认 gpt-image-2）生成 / 编辑图片，保存为本地文件。
+"""用 OpenAI Images API（默认 gpt-image-2.5-flare）生成 / 编辑图片，保存为本地文件。
 
 纯标准库实现，不依赖 openai SDK，Python 3.8+ 可直接运行。
 
@@ -32,7 +32,7 @@ import urllib.error
 import urllib.request
 
 VALID_SIZES = {"1024x1024", "1536x1024", "1024x1536", "auto"}
-VALID_QUALITY = {"low", "medium", "high", "auto"}
+VALID_QUALITY = {"low", "medium", "high", "xhigh", "max", "auto"}
 
 # 不少中转挂在 Cloudflare 后面，会拦默认的 Python-urllib UA（403 / error 1010）
 USER_AGENT = "curl/8.4.0"
@@ -218,7 +218,7 @@ def main():
     ap.add_argument("-p", "--prompt", help="提示词")
     ap.add_argument("-o", "--out", default="image.png",
                     help="输出路径（默认 image.png；n>1 自动加 _1/_2 后缀）")
-    ap.add_argument("--model", default="gpt-image-2", help="模型，默认 gpt-image-2")
+    ap.add_argument("--model", default="gpt-image-2.5-flare", help="模型，默认 gpt-image-2.5-flare")
     ap.add_argument("--size", default="1024x1024", choices=sorted(VALID_SIZES))
     ap.add_argument("--quality", default="auto", choices=sorted(VALID_QUALITY))
     ap.add_argument("-n", type=int, default=1, help="生成张数")

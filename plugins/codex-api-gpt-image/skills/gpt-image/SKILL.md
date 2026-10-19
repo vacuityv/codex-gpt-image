@@ -1,6 +1,6 @@
 ---
 name: "gpt-image"
-description: "Generate or edit raster images by calling the OpenAI Images API (gpt-image-2) through a bundled dependency-free CLI. Use when the user asks to draw, generate, create, or edit a picture / illustration / photo / asset, and especially when the built-in `image_gen` hosted tool is not available in the session (custom model provider, relay, or API-key auth). Also use for image-to-image edits from reference files. Do not use when the task is better served by editing existing SVG/vector assets or drawing directly in HTML/CSS/canvas."
+description: "Generate or edit raster images by calling the OpenAI Images API (gpt-image-2.5-flare) through a bundled dependency-free CLI. Use when the user asks to draw, generate, create, or edit a picture / illustration / photo / asset, and especially when the built-in `image_gen` hosted tool is not available in the session (custom model provider, relay, or API-key auth). Also use for image-to-image edits from reference files. Do not use when the task is better served by editing existing SVG/vector assets or drawing directly in HTML/CSS/canvas."
 ---
 
 # gpt-image
@@ -45,15 +45,15 @@ python3 "<skill_dir>/scripts/gen_image.py" \
 |------|------|------|
 | `-p/--prompt` | 提示词（除 `--check` 外必填） | — |
 | `-o/--out` | 输出路径；`n>1` 时自动加 `_1/_2` 后缀 | `image.png` |
-| `--model` | 模型 | `gpt-image-2` |
+| `--model` | 模型 | `gpt-image-2.5-flare` |
 | `--size` | `1024x1024` / `1536x1024`(横) / `1024x1536`(竖) / `auto` | `1024x1024` |
-| `--quality` | `low` / `medium` / `high` / `auto` | `auto` |
+| `--quality` | `low` / `medium` / `high` / `xhigh` / `max` / `auto` | `auto` |
 | `-n` | 生成张数 | `1` |
 | `--image` | 参考图，可多次传，触发图生图/编辑模式 | — |
 | `--mask` | 蒙版，仅编辑模式 | — |
 | `--check` | 只打印凭据来源，不发请求 | — |
 
-`gpt-image-2` 不支持 `background=transparent`。需要真透明底就换 `--model gpt-image-1.5`，或者让它在纯色背景上出图后再抠。
+`gpt-image-2` 不支持 `background=transparent`，`gpt-image-2.5-flare` 官方文档也没写支持。需要真透明底就换 `--model gpt-image-1.5`，或者让它在纯色背景上出图后再抠。
 
 ## 凭据
 
